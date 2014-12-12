@@ -51,7 +51,7 @@ int main (int argc, char *argv[]) {
             a[i]=x[i];
         for (i=0; i<N; i++) {
             for (j=1; j<N; j++) {
-                if (i==j)
+                if (i==j-1)
                     a[j*N+i]= 1;
                 else
                     a[j*N+i]=0;
