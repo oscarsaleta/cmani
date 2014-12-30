@@ -1,6 +1,6 @@
 OPT=-g -Wall
 
-TOT=pendol_int lorenz_int rtbps_int apartat3 apartat6 mani_rtbp
+TOT=pendol_int lorenz_int rtbps_int apartat3 apartat6 cmani_rtbp
 
 tot : $(TOT)
 
