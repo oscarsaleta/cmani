@@ -1,5 +1,0 @@
-./apartat3: x0 x1 ... xN T np
-./apartat3: x0 x1 ... xN T np
-./apartat3: x0 x1 ... xN T np
-./apartat3: x0 x1 ... xN T np
-./apartat3: x0 x1 ... xN T np

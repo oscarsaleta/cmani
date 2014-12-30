@@ -28,6 +28,7 @@ int flux (double *t, double x[], double *h, double T, double pasmin, double pasm
         i++;
         
     }
+    fprintf(stderr,"flux():: nombre màxim d'iteracions %d assolit\n",npasmax);
     return -1;
 }
 

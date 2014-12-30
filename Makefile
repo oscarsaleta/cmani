@@ -1,6 +1,6 @@
 OPT=-g -Wall
 
-TOT=pendol_int lorenz_int rtbps_int apartat3 cmani_rtbp
+TOT=pendol_int lorenz_int rtbps_int apartat3 apartat6 mani_rtbp
 
 tot : $(TOT)
 
@@ -20,6 +20,9 @@ rtbps_int : rtbps_int.c rtbps.o flux.o rk78.o
 apartat3 : apartat3.c rtbps.o flux.o rk78.o
 	gcc -o apartat3 $(OPT) apartat3.c rtbps.o flux.o rk78.o -lm
 
+apartat6 : apartat6.c cmani.o pendol.o sislin.o flux.o rk78.o
+	gcc -o apartat6 $(OPT) apartat6.c cmani.o pendol.o sislin.o flux.o rk78.o -lm
+
 cmani_rtbp : cmani_rtbp.c cmani.o rtbps.o sislin.o flux.o rk78.o
 	gcc -o cmani_rtbp $(OPT) cmani_rtbp.c cmani.o rtbps.o sislin.o flux.o rk78.o -lm
 
@@ -37,7 +40,7 @@ sislin.o : sislin.c
 	gcc -c $(OPT) sislin.c
 
 cmani.o : cmani.c
-	gcc -c $(OPT) cmani.c
+	gcc -c $(OPT) cmani.c -lm
 
 pendol.o : pendol.c
 	gcc -c $(OPT) pendol.c -lm

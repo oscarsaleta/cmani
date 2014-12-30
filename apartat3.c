@@ -50,11 +50,11 @@ int main (int argc, char *argv[]) {
         for (i=0; i<N; i++)
             a[i]=x[i];
         for (i=0; i<N; i++) {
-            for (j=1; j<N; j++) {
+            for (j=1; j<N+1; j++) {
                 if (i==j-1)
-                    a[j*N+i]= 1;
+                    a[j*N+i] = 1;
                 else
-                    a[j*N+i]=0;
+                    a[j*N+i] = 0;
             }
         }
             
@@ -95,15 +95,19 @@ int main (int argc, char *argv[]) {
                 }
             }
 
+            printf("t=%22.15E \n",t);
+            printf(" DPhi(t)          A(t)            diferència\n");
             /* ja tenim Df, podem imprimir-la juntament amb A(t) i la seva diferència */
-            for (i=0; i<36; i++)
-                printf("%22.15E  %22.15E  %22.15E\n",a[i+5],dphi[i],a[i+5]-dphi[i]);
-            printf("\n");
+            for (i=0; i<6; i++) {
+                for (k=0; k<6; k++)
+                    printf("%22.15E  %22.15E  %22.15E\n",DPHI(i,k),a[6+i+6*k],DPHI(i,k)-a[6+i+6*k]);
+                printf("\n");
+            }
+            printf("\n\n");
             /* guardem el pas fet a la primera crida al flux a x */
             for (i=0; i<N; i++)
                 x[i]=a[i];
         }
-        printf("\n\n");
 
     }
 
