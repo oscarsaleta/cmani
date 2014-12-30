@@ -90,8 +90,8 @@ int cmani (int m, int n, double x0[], double xf[], double dt, double dv[],
             normdifdv += (dv[i]-olddv[i])*(dv[i]-olddv[i]);
             normsq += g[i]*g[i];
         }
-        printf("ng %g ",normdifdv);
-        if (/*sqrt(normsq) < tol || */ k>0 && normdifdv < tol*tol)
+        printf("ng %g ",sqrt(normdifdv));
+        if ( sqrt(normsq) < tol || (k>0 && normdifdv < tol*tol) )
             break;
 
         /* Ens cal resoldre DG*corr=G */
