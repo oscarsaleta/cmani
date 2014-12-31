@@ -56,7 +56,7 @@ int cmani_gdg (int m, double x0[], double xf[], double dt, double dv[],
 #undef XPDV
 #undef DG
 
-int cmani (int m, int n, double x0[], double xf[], double dt, double dv[],
+int cmani (int m, double x0[], double xf[], double dt, double dv[],
         double tol, int maxit,
         double pas0, double pasmin, double pasmax, double tolfl, int npasmx,
         int (*camp)(int n, double t, double x[], double f[], void *prm),
@@ -66,6 +66,7 @@ int cmani (int m, int n, double x0[], double xf[], double dt, double dv[],
     double g[m],dg[m*m],pivfl[m],olddv[m];
     double dgaux[m*m];
     double corr[m], normsq, normcorr, normdifdv;
+    int n = 2*m*(1+2*m);
     int i,j,k;
 
     /* Resolem el sistema de (5), G(dv0)=0, pel mètode de Newton */

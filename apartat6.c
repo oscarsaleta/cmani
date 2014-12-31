@@ -21,8 +21,7 @@ int main (int argc, char *argv[]) {
     double xf[] = {0,-sqrt(2*(1-cos(1)))};
     double dt = 1.57079633;
 
-    int n=6;
-    cmani(m,n,&x0[0],&xf[0],dt,&dv[0],TOLNWT,MAXIT,PAS0,PASMIN,PASMAX,TOLFL,NPASMX,CAMP,NULL);
+    cmani(m,&x0[0],&xf[0],dt,&dv[0],TOLNWT,MAXIT,PAS0,PASMIN,PASMAX,TOLFL,NPASMX,CAMP,NULL);
 
     return 0;
 }
