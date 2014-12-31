@@ -46,7 +46,7 @@ int cmani_gdg (int m, double x0[], double xf[], double dt, double dv[],
     }
     for (i=0; i<m; i++) {
         for (j=0; j<m; j++) {
-            DG(i,j) = xpdv[(j+m+1)*m+i];
+            DG(i,j) = xpdv[(j+m+1)*2*m+i];
         }
     }
 
@@ -66,7 +66,6 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
     double g[m],dg[m*m],pivfl[m],olddv[m];
     double dgaux[m*m];
     double corr[m], normsq, normcorr, normdifdv;
-    int n = 2*m*(1+2*m);
     int i,j,k;
 
     /* Resolem el sistema de (5), G(dv0)=0, pel mètode de Newton */
@@ -114,13 +113,13 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
 
     /* Ara aïllem dv1 de (4) */
     cmani_gdg(m,x0,xf,dt,dv,g,dg,pivfl,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
-    for (i=m; i<2*m; i++) {
-        dv[i] = xf[i]-g[i];
+    for (i=0; i<m; i++) {
+        dv[i+m] = xf[i+m]-pivfl[i];
     }
 
     printf("\ndv[]\n");
     for (i=0; i<2*m; i++)
-        printf("  %25.15g\n",dv[i]);
+        printf("  %25.17g\n",dv[i]);
 
     return 0;
 }
