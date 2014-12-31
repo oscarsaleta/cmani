@@ -58,6 +58,7 @@ int cmani_gdg (int m, double x0[], double xf[], double dt, double dv[],
 
 #define DG(i,j) dg[(j)*m+(i)]
 #define DGAUX(i,j) dgaux[(j)*m+(i)]
+#define DGOLD(i,j) dgold[(j)*m+(i)]
 int cmani (int m, double x0[], double xf[], double dt, double dv[],
         double tol, int maxit,
         double pas0, double pasmin, double pasmax, double tolfl, int npasmx,
@@ -67,32 +68,49 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
 
     double g[m],dg[m*m],pivfl[m];
     double dgaux[m*m];
+    double gold[m],dgold[m*m],pivflold[m];
     double corr[m], normsq, normcorr;
     int i,j,k;
+
+    /* Guardem els valors de g i dg en variables "old" */
+    for (i=0; i<m; i++) {
+        gold[i] = g[i];
+        pivflold[i] = 0;
+        for (j=0; j<m; j++)
+            DGOLD(i,j) = DG(i,j);
+    }
 
     /* Resolem el sistema de (5), G(dv0)=0, pel mètode de Newton */
     for (k=0; k<maxit; k++) {
 
+        /* Actualitzem g, dg i pivfl */
+        for (i=0; i<m; i++) {
+            g[i] = gold[i];
+            pivfl[i] = pivflold[i];
+            for(j=0; j<m; j++)
+                DG(i,j) = DGOLD(i,j);
+        }
+
         /* Passo a cmani_gdg l'argument dv perquè només usaré les primeres m components */
-        cmani_gdg(m,x0,xf,dt,dv,g,dg,pivfl,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
+        cmani_gdg(m,x0,xf,dt,dv,gold,dgold,pivflold,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
 
         /* Calculo una còpia de dg perquè la resolució LU la sobreescriu */
         for (i=0; i<m; i++) {
             for (j=0; j<m; j++) {
-                DGAUX(i,j) = DG(i,j);
+                DGAUX(i,j) = DGOLD(i,j);
             }
         }
 
         printf("cmani():: it %d ",k);
 
         /* Ens cal resoldre DG*corr=G */
-        gauss(m,dgaux,g,corr);
+        gauss(m,dgaux,gold,corr);
 
         /* Criteri d'aturada: |corr| < tol. */
         normsq   = 0;
         normcorr = 0;
         for (i=0; i<m; i++) {
-            normsq += g[i]*g[i];
+            normsq += gold[i]*gold[i];
             normcorr += corr[i]*corr[i];
         }
         printf("ng %g ",sqrt(normsq));
@@ -110,15 +128,15 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
     }
 
     /* Ara aïllem dv1 de (4) */
-    cmani_gdg(m,x0,xf,dt,dv,g,dg,pivfl,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
+//    cmani_gdg(m,x0,xf,dt,dv,g,dg,pivfl,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
     for (i=0; i<m; i++) {
         dv[i+m] = xf[i+m]-pivfl[i];
     }
 
-    printf("\ndv[]\n");
+    printf("\ndv[] ");
     for (i=0; i<2*m; i++)
-        printf("  %25.17g\n",dv[i]);
-
+        printf("%20.17g ",dv[i]);
+    printf("\n");
     return 0;
 }
 
