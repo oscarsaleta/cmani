@@ -4,8 +4,8 @@
 #include "flux.h"
 #include "sislin.h"
 
-#define XPDV(i,j) xpdv[j*2*m+i]
-#define DG(i,j) dg[j*m+i]
+#define XPDV(i,j) xpdv[(j)*2*m+(i)]
+#define DG(i,j) dg[(j)*m+(i)]
 
 int cmani_gdg (int m, double x0[], double xf[], double dt, double dv[],
         double g[], double dg[], double pivfl[],
@@ -46,7 +46,7 @@ int cmani_gdg (int m, double x0[], double xf[], double dt, double dv[],
     }
     for (i=0; i<m; i++) {
         for (j=0; j<m; j++) {
-            DG(i,j) = xpdv[(j+m+1)*2*m+i];
+            DG(i,j) = XPDV(i,j+m+1);
         }
     }
 
@@ -56,6 +56,8 @@ int cmani_gdg (int m, double x0[], double xf[], double dt, double dv[],
 #undef XPDV
 #undef DG
 
+#define DG(i,j) dg[(j)*m+(i)]
+#define DGAUX(i,j) dgaux[(j)*m+(i)]
 int cmani (int m, double x0[], double xf[], double dt, double dv[],
         double tol, int maxit,
         double pas0, double pasmin, double pasmax, double tolfl, int npasmx,
@@ -63,9 +65,9 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
         void *prm
         ) {
 
-    double g[m],dg[m*m],pivfl[m],olddv[m];
+    double g[m],dg[m*m],pivfl[m];
     double dgaux[m*m];
-    double corr[m], normsq, normcorr, normdifdv;
+    double corr[m], normsq, normcorr;
     int i,j,k;
 
     /* Resolem el sistema de (5), G(dv0)=0, pel mètode de Newton */
@@ -77,34 +79,30 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
         /* Calculo una còpia de dg perquè la resolució LU la sobreescriu */
         for (i=0; i<m; i++) {
             for (j=0; j<m; j++) {
-                dgaux[j*m+i] = dg[j*m+i];
+                DGAUX(i,j) = DG(i,j);
             }
         }
 
         printf("cmani():: it %d ",k);
 
-        /* Criteri d'aturada: |G(dv)| < tol o bé |G(xk+1)-G(xk)| < tol */
-        normsq = 0;
-        normdifdv = 0;
-        for (i=0; i<m; i++) {
-            normdifdv += (dv[i]-olddv[i])*(dv[i]-olddv[i]);
-            normsq += g[i]*g[i];
-        }
-        printf("ng %g ",sqrt(normdifdv));
-        if ( sqrt(normsq) < tol || (k>0 && normdifdv < tol*tol) )
-            break;
-
         /* Ens cal resoldre DG*corr=G */
         gauss(m,dgaux,g,corr);
 
-        /* Ara apliquem la correcció a dv0 */
+        /* Criteri d'aturada: |corr| < tol. */
+        normsq   = 0;
         normcorr = 0;
         for (i=0; i<m; i++) {
-            olddv[i] = dv[i];
-            dv[i] -= corr[i];
+            normsq += g[i]*g[i];
             normcorr += corr[i]*corr[i];
         }
+        printf("ng %g ",sqrt(normsq));
+        if (sqrt(normcorr)<tol)
+            break;
         printf("nc %g\n",sqrt(normcorr));
+        /* Ara apliquem la correcció a dv */
+        for (i=0; i<m; i++) {
+            dv[i] -= corr[i];
+        }
         
         if (k==maxit-1) {
             fprintf(stderr,"cmani():: assolit nombre màxim d'iteracions de Newton %d\n",maxit);
