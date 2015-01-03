@@ -58,7 +58,6 @@ int cmani_gdg (int m, double x0[], double xf[], double dt, double dv[],
 
 #define DG(i,j) dg[(j)*m+(i)]
 #define DGAUX(i,j) dgaux[(j)*m+(i)]
-#define DGOLD(i,j) dgold[(j)*m+(i)]
 int cmani (int m, double x0[], double xf[], double dt, double dv[],
         double tol, int maxit,
         double pas0, double pasmin, double pasmax, double tolfl, int npasmx,
@@ -89,11 +88,6 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
         /* Ens cal resoldre DG*corr=G */
         gauss(m,dgaux,g,corr);
 
-        /* Ara apliquem la correcció a dv */
-        for (i=0; i<m; i++) {
-            dv[i] -= corr[i];
-        }
-
         /* Criteri d'aturada: |corr| < tol. */
         normsq   = 0;
         normcorr = 0;
@@ -101,19 +95,22 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
             normsq += g[i]*g[i];
             normcorr += corr[i]*corr[i];
         }
+        fprintf(stderr,"ng %g ", sqrt(normsq));
         if (sqrt(normcorr)<tol)
             break;
-        /* Imprimir valors parcials de les normes */
-        if (k < maxit-1)
-            fprintf(stderr,"ng %g nc %g\n",sqrt(normsq),sqrt(normcorr));
-        else
+        printf("nc %g\n",sqrt(normcorr));
+
+        /* Ara apliquem la correcció a dv */
+        for (i=0; i<m; i++) {
+            dv[i] -= corr[i];
+        }
+
+        if (k==maxit-1)
             fprintf(stderr,"cmani():: assolit nombre màxim d'iteracions de Newton %d\n",maxit);
-
-
     }
 
     /* Ara aïllem dv1 de (4) */
-    fprintf(stderr,"ng %g",sqrt(normsq));
+    cmani_gdg(m,x0,xf,dt,dv,g,dg,pivfl,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
     for (i=0; i<m; i++)
         dv[i+m] = xf[i+m]-pivfl[i];
 
