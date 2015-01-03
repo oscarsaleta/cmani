@@ -35,7 +35,7 @@ int cmani_gdg (int m, double x0[], double xf[], double dt, double dv[],
     }
     
     /* Calculo el flux a temps 0 perquè el sistema és autònom */
-    if (flux(&t,xpdv,&h,dt,pasmin,pasmax,tolfl,npasmx,2*m*(1+2*m),camp,prm) == -1) {
+    if (flux(&t,xpdv,&h,dt,pasmin,pasmax,tolfl,npasmx,n,camp,prm) == -1) {
         return -1;
     }
 
