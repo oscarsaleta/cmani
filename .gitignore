@@ -3,6 +3,7 @@ apartat6
 pendol_int
 lorenz_int
 rtbps_int
+cmani_rtbp
 *.o
 *.out
 *.pdf

@@ -35,7 +35,7 @@ int cmani_gdg (int m, double x0[], double xf[], double dt, double dv[],
     }
     
     /* Calculo el flux a temps 0 perquè el sistema és autònom */
-    if (flux(&t,xpdv,&h,dt,pasmin,pasmax,tolfl,npasmx,2*m*(1+2*m),camp,prm) == -1) {
+    if (flux(&t,xpdv,&h,dt,pasmin,pasmax,tolfl,npasmx,n,camp,prm) == -1) {
         return -1;
     }
 
@@ -68,70 +68,54 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
 
     double g[m],dg[m*m],pivfl[m];
     double dgaux[m*m];
-    double gold[m],dgold[m*m],pivflold[m];
     double corr[m], normsq, normcorr;
     int i,j,k;
-
-    /* Guardem els valors de g i dg en variables "old" */
-    for (i=0; i<m; i++) {
-        gold[i] = g[i];
-        pivflold[i] = 0;
-        for (j=0; j<m; j++)
-            DGOLD(i,j) = DG(i,j);
-    }
 
     /* Resolem el sistema de (5), G(dv0)=0, pel mètode de Newton */
     for (k=0; k<maxit; k++) {
 
-        /* Actualitzem g, dg i pivfl */
-        for (i=0; i<m; i++) {
-            g[i] = gold[i];
-            pivfl[i] = pivflold[i];
-            for(j=0; j<m; j++)
-                DG(i,j) = DGOLD(i,j);
-        }
-
         /* Passo a cmani_gdg l'argument dv perquè només usaré les primeres m components */
-        cmani_gdg(m,x0,xf,dt,dv,gold,dgold,pivflold,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
+        cmani_gdg(m,x0,xf,dt,dv,g,dg,pivfl,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
 
         /* Calculo una còpia de dg perquè la resolució LU la sobreescriu */
         for (i=0; i<m; i++) {
             for (j=0; j<m; j++) {
-                DGAUX(i,j) = DGOLD(i,j);
+                DGAUX(i,j) = DG(i,j);
             }
         }
 
-        printf("cmani():: it %d ",k);
+        fprintf(stderr,"cmani():: it %d ",k);
 
         /* Ens cal resoldre DG*corr=G */
-        gauss(m,dgaux,gold,corr);
+        gauss(m,dgaux,g,corr);
+
+        /* Ara apliquem la correcció a dv */
+        for (i=0; i<m; i++) {
+            dv[i] -= corr[i];
+        }
 
         /* Criteri d'aturada: |corr| < tol. */
         normsq   = 0;
         normcorr = 0;
         for (i=0; i<m; i++) {
-            normsq += gold[i]*gold[i];
+            normsq += g[i]*g[i];
             normcorr += corr[i]*corr[i];
         }
-        printf("ng %g ",sqrt(normsq));
         if (sqrt(normcorr)<tol)
             break;
-        printf("nc %g\n",sqrt(normcorr));
-        /* Ara apliquem la correcció a dv */
-        for (i=0; i<m; i++) {
-            dv[i] -= corr[i];
-        }
-        
-        if (k==maxit-1) {
+        /* Imprimir valors parcials de les normes */
+        if (k < maxit-1)
+            fprintf(stderr,"ng %g nc %g\n",sqrt(normsq),sqrt(normcorr));
+        else
             fprintf(stderr,"cmani():: assolit nombre màxim d'iteracions de Newton %d\n",maxit);
-        }
+
+
     }
 
     /* Ara aïllem dv1 de (4) */
-//    cmani_gdg(m,x0,xf,dt,dv,g,dg,pivfl,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
-    for (i=0; i<m; i++) {
+    fprintf(stderr,"ng %g",sqrt(normsq));
+    for (i=0; i<m; i++)
         dv[i+m] = xf[i+m]-pivfl[i];
-    }
 
     printf("\ndv[] ");
     for (i=0; i<2*m; i++)
