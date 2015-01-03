@@ -98,7 +98,7 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
         fprintf(stderr,"ng %g ", sqrt(normsq));
         if (sqrt(normcorr)<tol)
             break;
-        printf("nc %g\n",sqrt(normcorr));
+        fprintf(stderr,"nc %g\n",sqrt(normcorr));
 
         /* Ara apliquem la correcció a dv */
         for (i=0; i<m; i++) {
@@ -108,16 +108,14 @@ int cmani (int m, double x0[], double xf[], double dt, double dv[],
         if (k==maxit-1)
             fprintf(stderr,"cmani():: assolit nombre màxim d'iteracions de Newton %d\n",maxit);
     }
+    fprintf(stderr,"\n");
 
     /* Ara aïllem dv1 de (4) */
     cmani_gdg(m,x0,xf,dt,dv,g,dg,pivfl,pas0,pasmin,pasmax,tolfl,npasmx,camp,prm);
     for (i=0; i<m; i++)
         dv[i+m] = xf[i+m]-pivfl[i];
 
-    printf("\ndv[] ");
-    for (i=0; i<2*m; i++)
-        printf("%20.17g ",dv[i]);
-    printf("\n");
+    
     return 0;
 }
 

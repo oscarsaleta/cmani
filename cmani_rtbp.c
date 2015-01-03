@@ -37,13 +37,9 @@ int main (int argc, char *argv[]) {
     }
 
     /* Bucle del programa */
-    while ( scanf("%lf",&x[0])==1 ) {
+    while ( scanf("%lf",&dt)==1 ) {
         /* Lectura d'arguments dins del programa */
-        if (scanf("%lf",&dt)!=1) {
-                fprintf(stderr, "%s: dt xi0 xi1 xi2 vi1 vi2 vi3 xf0 xf1 xf2 vf0 vf1 vf2\n",argv[0]);
-                return -1;
-        }
-        for (i=1; i<2*N; i++) {
+        for (i=0; i<2*N; i++) {
             if (scanf("%lf",&x[i])!=1) {
                 fprintf(stderr, "%s: dt xi0 xi1 xi2 vi1 vi2 vi3 xf0 xf1 xf2 vf0 vf1 vf2\n",argv[0]);
                 return -1;
@@ -62,6 +58,7 @@ int main (int argc, char *argv[]) {
         for (i=0; i<N; i++)
             printf("%22.15E ",dv[i]);
 
+        printf("\n");
     }
         
 
