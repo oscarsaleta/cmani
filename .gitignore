@@ -1,3 +1,4 @@
+.gitignore
 apartat3
 apartat6
 pendol_int
@@ -7,3 +8,8 @@ cmani_rtbp
 *.o
 *.out
 *.pdf
+.apartat3.c.swp
+pendol_back.txt
+pendol_backwards.txt
+pendol_err.txt
+pendol_err_back.txt
