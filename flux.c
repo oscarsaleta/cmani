@@ -13,7 +13,7 @@ int flux (double *t, double x[], double *h, double T, double pasmin, double pasm
     double tmax=*t+T; /* pot ser menor que *t */
     double haux;
     int sigT = SIG(T);
-    /* si ens donen un temps negatiu i un pas positiu */
+    /* si ens donen un temps negatiu i un pas positiu, ho corregim */
     if (SIG(*h)!=sigT)
         *h *= -1;
 
@@ -23,7 +23,7 @@ int flux (double *t, double x[], double *h, double T, double pasmin, double pasm
             rk78(t,x,h,pasmin,pasmax,tol,n,camp,prm);
         }
         else {
-            /* si no, fem una sèrie de passos fins arribar al final */
+            /* si no, fem una serie de passos fins arribar al final */
             haux=tmax-*t;
             while (fabs(*t+haux) <= fabs(tmax)) {
                 if (fabs(haux) > pasmin) {
@@ -37,7 +37,7 @@ int flux (double *t, double x[], double *h, double T, double pasmin, double pasm
         i++;
         
     }
-    fprintf(stderr,"flux():: nombre màxim d'iteracions %d assolit\n",npasmax);
+    fprintf(stderr,"flux():: nombre max d'iteracions %d assolit\n",npasmax);
     return -1;
 }
 
